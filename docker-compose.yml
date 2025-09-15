@@ -1,0 +1,38 @@
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: alkemis
+      POSTGRES_PASSWORD: alkemis
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "mydb"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+
+  pgadmin:
+    container_name: postgres_db
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+       PGADMIN_DEFAULT_EMAIL: "admin@gmail.com"
+       PGADMIN_DEFAULT_PASSWORD: "root"
+    ports:
+      - "5051:80"
+    #volumes:
+     # - pgdata:/var/lib/postgresql/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      
+
+
+volumes:
+  postgres-db-volume:
+  #pgdata:
